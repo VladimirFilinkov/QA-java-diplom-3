@@ -20,15 +20,24 @@ public class LoginPageTest {
     protected WebDriver driver;
     private WebDriverWait wait;
 
+    private String browserType;
 
     @Before
     public void setUp() {
-        System.setProperty("webdriver.chrome.driver", Client.chromeDriverPath);
-        driver = new ChromeDriver();
+        browserType = System.getProperty("browserType", "chrome");
+
+        if ("yandex".equalsIgnoreCase(browserType)) {
+            System.setProperty("webdriver.chrome.driver", Client.yandexDriverPath);
+            driver = new ChromeDriver();
+        } else {
+            System.setProperty("webdriver.chrome.driver", Client.chromeDriverPath);
+            driver = new ChromeDriver();
+        }
+
         driver.manage().window().maximize();
         wait = new WebDriverWait(driver, Duration.ofSeconds(3));
 
-        //Создаем тестового пользователя через API
+        // Создаем тестового пользователя через API
         testUser = CreateTestUser.randomUser();
         accessToken = CreateTestUser.createUser(testUser);
     }

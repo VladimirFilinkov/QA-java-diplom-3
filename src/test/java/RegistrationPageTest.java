@@ -23,21 +23,31 @@ public class RegistrationPageTest {
     private String accessToken;
     private CreateTestUser testUser;
 
+    private String browserType; // Переменная для типа браузера
+
     @Before
     public void setUp() {
-        System.setProperty("webdriver.chrome.driver", Client.chromeDriverPath);
-        driver = new ChromeDriver();
+        // Получаем тип браузера из системного свойства, по умолчанию "chrome"
+        browserType = System.getProperty("browserType", "chrome");
+
+        if ("yandex".equalsIgnoreCase(browserType)) {
+            System.setProperty("webdriver.chrome.driver", Client.yandexDriverPath);
+            driver = new ChromeDriver();
+        } else {
+            System.setProperty("webdriver.chrome.driver", Client.chromeDriverPath);
+            driver = new ChromeDriver();
+        }
+
         driver.manage().window().maximize();
         wait = new WebDriverWait(driver, Duration.ofSeconds(3));
         registrationPage = new RegistrationPage(driver);
     }
 
-    @After //Удаляем пользователя, если он был создан и закрываем браузер
+    @After // Удаляем пользователя, если он был создан и закрываем браузер
     public void tearDown() {
         if (testUser != null) {
             accessToken = CreateTestUser.logInAndGetToken(testUser);
             if (accessToken != null) {
-                accessToken = CreateTestUser.logInAndGetToken(testUser);
                 CreateTestUser.deleteUser(accessToken).statusCode(HTTP_ACCEPTED);
                 System.out.println("Тесты окончены, тестовый пользователь удалён");
             }
@@ -70,7 +80,6 @@ public class RegistrationPageTest {
         });
     }
 
-
     @Test
     @DisplayName("Проверяем ошибку при вводе короткого пароля (5 символов)")
     public void testNotSuccessfulRegistrationPassword5() {
@@ -81,7 +90,7 @@ public class RegistrationPageTest {
         });
 
         Allure.step("Заполняем форму регистрации тестовыми данными", () -> {
-        registrationPage.Registration(CreateTestUser.randomUser().getName(), CreateTestUser.randomUser().getEmail(), "P@ss1");
+            registrationPage.Registration(CreateTestUser.randomUser().getName(), CreateTestUser.randomUser().getEmail(), "P@ss1");
         });
 
         Allure.step("Ошибка \"Некорректный пароль\" отображается", () -> {
@@ -92,7 +101,7 @@ public class RegistrationPageTest {
 
     @Test
     @DisplayName("Проверяем отсутствие ошибки при вводе допустимого пароля (6 символов)")
-    public void testSuccessfulRegistrationPassword6() throws InterruptedException{
+    public void testSuccessfulRegistrationPassword6() throws InterruptedException {
         testUser = CreateTestUser.randomUser();
         Allure.step("Открываем Страницу регистрации", () -> {
             driver.get(Client.REGISTER_PAGE);
@@ -100,13 +109,13 @@ public class RegistrationPageTest {
         });
 
         Allure.step("Заполняем форму регистрации тестовыми данными", () -> {
-        registrationPage.Registration(CreateTestUser.randomUser().getName(), CreateTestUser.randomUser().getEmail(), "P@ssw1");
+            registrationPage.Registration(CreateTestUser.randomUser().getName(), CreateTestUser.randomUser().getEmail(), "P@ssw1");
         });
 
         Allure.step("Ошибка \"Некорректный пароль\" не отображается", () -> {
-        Thread.sleep(2000);
-        Assert.assertTrue("Ошибка 'Некорректный пароль' отображается, хотя не должна",
-                          registrationPage.isErrorIncorrectPasswordNotDisplayed());
+            Thread.sleep(2000);
+            Assert.assertTrue("Ошибка 'Некорректный пароль' отображается, хотя не должна",
+                              registrationPage.isErrorIncorrectPasswordNotDisplayed());
         });
     }
 }

@@ -4,6 +4,8 @@ public class Client {
 
     //Путь к драйверу
     public static String chromeDriverPath = "C:\\WebDriver\\bin\\chromedriver.exe";
+    public static String yandexDriverPath = "C:\\WebDriver\\bin\\yandexdriver.exe";
+
 
     // Страницы тестового стенда
     public final static String MAIN_PAGE = "https://stellarburgers.nomoreparties.site/";

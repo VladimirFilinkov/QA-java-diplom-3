@@ -25,10 +25,21 @@ public class OtherTest {
     private CreateTestUser testUser;
     private String accessToken;
 
+    private String browserType; // Переменная для типа браузера
+
     @Before
     public void setUp() {
-        System.setProperty("webdriver.chrome.driver", Client.chromeDriverPath);
-        driver = new ChromeDriver();
+        // Получаем тип браузера из системного свойства, по умолчанию "chrome"
+        browserType = System.getProperty("browserType", "chrome");
+
+        if ("yandex".equalsIgnoreCase(browserType)) {
+            System.setProperty("webdriver.chrome.driver", Client.yandexDriverPath);
+            driver = new ChromeDriver();
+        } else {
+            System.setProperty("webdriver.chrome.driver", Client.chromeDriverPath);
+            driver = new ChromeDriver();
+        }
+
         driver.manage().window().maximize();
         wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     }
